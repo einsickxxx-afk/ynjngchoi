@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해양사업부 근무실적 현황 대시보드 — 발표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ▶ 색상 편집은 여기서만 하면 됩니다.
+   아래 HEX 값만 바꾸면 파일 전체 색이 즉시 바뀝니다.
+   ============================================================ */
+:root{
+  --bg:        #0A1220;
+  --panel:     #0F1B2E;
+  --panel-2:   #132339;
+  --line:      #22344E;
+  --line-bright:#3A5578;
+  --steel:     #6E8CAD;
+  --sky:       #8FB4D9;
+  --coral:     #E2646C;
+  --amber:     #E8A94C;
+  --text:      #DCE6F2;
+  --muted:     #7C93AF;
+
+  --act1: var(--amber);
+  --act2: var(--coral);
+  --act3: var(--sky);
+
+  --mono:'JetBrains Mono',monospace;
+  --sans:'IBM Plex Sans KR',sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0; height:100%; overflow:hidden;}
+body{
+  background:
+    radial-gradient(1200px 700px at 12% -10%, #142743 0%, transparent 55%),
+    radial-gradient(900px 600px at 100% 100%, #0F2138 0%, transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+}
+
+#deck{ position:relative; width:100vw; height:100vh; overflow:hidden; }
+#track{ display:flex; height:100%; transition:transform .55s cubic-bezier(.65,0,.35,1); }
+.slide{ min-width:100vw; height:100%; display:flex; flex-direction:column; justify-content:center; padding:0 9vw; position:relative; }
+.slide-inner{ max-width:980px; margin:0 auto; width:100%; }
+
+.kicker{ font-family:var(--mono); font-size:12px; letter-spacing:0.16em; color:var(--kicker-color, var(--amber)); text-transform:uppercase; margin:0 0 14px; display:flex; align-items:center; gap:10px; }
+.kicker::before{ content:""; width:22px; height:1px; background:var(--kicker-color, var(--amber)); }
+h1.big{ font-size:clamp(30px,4.6vw,54px); line-height:1.24; font-weight:700; letter-spacing:-0.01em; margin:0 0 20px; }
+h1.big span{ color:var(--steel); }
+h2.slide-title{ font-size:clamp(24px,3.2vw,36px); font-weight:700; margin:0 0 12px; letter-spacing:-0.01em; }
+.lede{ font-size:clamp(14px,1.4vw,17px); color:var(--muted); line-height:1.85; max-width:660px; margin:0; }
+.hint{ font-family:var(--mono); font-size:11px; color:var(--muted); margin:0 0 26px; display:flex; align-items:center; gap:7px; }
+.hint .dot-ico{ width:5px; height:5px; border-radius:50%; background:var(--coral); flex-shrink:0; animation:pulse 1.8s ease-in-out infinite; }
+@keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+code{ font-family:var(--mono); font-size:0.92em; background:rgba(143,180,217,0.12); color:var(--sky); padding:1px 6px; border-radius:4px; }
+.code-block{ font-family:var(--mono); font-size:clamp(11px,1.1vw,13.5px); line-height:1.75; background:#081120; border:1px solid var(--line); border-radius:10px; padding:16px 18px; color:#9FC4E8; overflow-x:auto; white-space:pre; }
+.code-block .c1{color:var(--coral);} .code-block .c2{color:var(--amber);} .code-block .c3{color:var(--muted);}
+
+#s0{ align-items:flex-start; }
+#s0 .filehint{ margin-top:30px; font-family:var(--mono); font-size:12.5px; color:var(--sky); border:1px solid var(--line); border-radius:8px; padding:10px 16px; display:inline-block; }
+#s0 .presenter{ position:absolute; bottom:9vh; left:9vw; font-family:var(--mono); font-size:12px; color:var(--muted); }
+
+/* ---------- 클릭 가능한 요소 공통 스타일 ---------- */
+.expandable{ cursor:pointer; position:relative; transition:border-color .15s ease, transform .12s ease, background .15s ease; }
+.expandable:hover{ border-color:var(--sky); transform:translateY(-3px); background:var(--panel-2); }
+.expandable::after{
+  content:"＋"; position:absolute; top:10px; right:12px;
+  font-family:var(--mono); font-size:12px; color:var(--muted);
+  transition:color .15s ease;
+}
+.expandable:hover::after{ color:var(--sky); }
+
+.rail{ display:flex; align-items:center; gap:0; flex-wrap:wrap; margin-top:8px; }
+.rail-step{ display:flex; flex-direction:column; gap:6px; border:1px solid var(--line); background:var(--panel); border-radius:12px; padding:16px 24px 16px 18px; min-width:150px; }
+.rail-step b{ font-size:14px; } .rail-step span{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+.rail-arrow{ color:var(--steel); font-size:20px; padding:0 10px; flex-shrink:0; }
+@media (max-width:900px){ .rail{ flex-direction:column; align-items:stretch;} .rail-arrow{ transform:rotate(90deg); align-self:center; padding:4px 0;} }
+
+.cols{ display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:start; }
+@media (max-width:820px){ .cols{ grid-template-columns:1fr; } }
+.col-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px; }
+.col-list li{ border-left:2px solid var(--line-bright); border-radius:0 8px 8px 0; padding:8px 14px 8px 16px; }
+.col-list li.expandable::after{ top:9px; right:10px; }
+.col-list li.expandable:hover{ border-left-color:var(--sky); }
+.col-list li b{ display:block; font-size:14.5px; margin-bottom:3px; }
+.col-list li p{ margin:0; font-size:13px; color:var(--muted); line-height:1.7; }
+
+.grid8{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:6px; }
+@media (max-width:900px){ .grid8{ grid-template-columns:repeat(2,1fr); } }
+.grid8 .cell{ border:1px solid var(--line); background:var(--panel); border-radius:10px; padding:14px 26px 14px 15px; }
+.grid8 .cell .ft{ font-family:var(--mono); font-size:10.5px; color:var(--coral); margin-bottom:5px; }
+.grid8 .cell .fn{ font-weight:600; font-size:13.5px; margin-bottom:6px; }
+.grid8 .cell .fd{ font-size:11.5px; color:var(--muted); line-height:1.6; }
+
+.bignum-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:10px; }
+@media (max-width:820px){ .bignum-grid{ grid-template-columns:1fr; } }
+.bignum{ border:1px solid var(--line); background:var(--panel); border-radius:12px; padding:20px 26px 20px 20px; }
+.bignum .n{ font-family:var(--mono); font-size:clamp(26px,3vw,36px); font-weight:600; color:var(--sky); }
+.bignum .l{ font-size:12.5px; color:var(--muted); margin-top:6px; line-height:1.6; }
+
+.timeline{ display:flex; flex-direction:column; gap:0; margin-top:10px; }
+.tl-item{ display:grid; grid-template-columns:110px 1fr; gap:20px; padding:16px 26px 16px 4px; border-top:1px solid var(--line); border-radius:8px; }
+.tl-item:first-child{ border-top:none; }
+.tl-item.expandable::after{ top:16px; right:8px; }
+.tl-item .when{ font-family:var(--mono); font-size:11.5px; color:var(--amber); padding-top:2px; }
+.tl-item .what b{ display:block; font-size:14.5px; margin-bottom:4px; }
+.tl-item .what p{ margin:0; font-size:13px; color:var(--muted); line-height:1.7; }
+
+.summary-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:26px; }
+@media (max-width:820px){ .summary-grid{ grid-template-columns:1fr; } }
+.summary-grid div{ font-size:12.5px; color:var(--muted); line-height:1.75; border-top:1px solid var(--line); padding-top:12px; }
+.summary-grid b{ display:block; color:var(--text); font-size:14px; margin-bottom:6px; }
+
+#progress{ position:fixed; top:0; left:0; height:2px; background:var(--coral); transition:width .5s ease, background .3s ease; z-index:20; }
+#navbar{ position:fixed; bottom:26px; left:0; right:0; display:flex; align-items:center; justify-content:center; gap:18px; z-index:20; }
+.nav-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--line-bright); background:var(--panel); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; transition:border-color .15s, background .15s; }
+.nav-btn:hover{ border-color:var(--sky); background:var(--panel-2); }
+.nav-btn:disabled{ opacity:0.3; cursor:default; }
+#dots{ display:flex; gap:7px; }
+.dot{ width:7px; height:7px; border-radius:50%; background:var(--line-bright); cursor:pointer; transition:background .15s, transform .15s; }
+.dot.active{ background:var(--coral); transform:scale(1.3); }
+#counter{ position:fixed; top:22px; right:28px; font-family:var(--mono); font-size:12px; color:var(--muted); z-index:20; }
+#actlabel{ position:fixed; top:22px; left:28px; font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; z-index:20; transition:color .3s ease; }
+#actbar{ position:fixed; top:6px; left:28px; display:flex; gap:4px; z-index:20; }
+#actbar span{ width:26px; height:2px; background:var(--line); border-radius:2px; transition:background .3s ease; }
+
+/* ---------- 상세 설명 모달 ---------- */
+#modalOverlay{
+  position:fixed; inset:0; z-index:60;
+  background:rgba(5,9,16,0.72);
+  backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:opacity .2s ease;
+  padding:24px;
+}
+#modalOverlay.open{ opacity:1; pointer-events:auto; }
+#modalBox{
+  max-width:560px; width:100%;
+  max-height:78vh; overflow-y:auto;
+  background:var(--panel-2);
+  border:1px solid var(--line-bright);
+  border-top:3px solid var(--modal-accent, var(--coral));
+  border-radius:14px;
+  padding:30px 32px;
+  transform:translateY(14px) scale(.97);
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+}
+#modalOverlay.open #modalBox{ transform:translateY(0) scale(1); }
+#modalClose{
+  position:absolute; top:16px; right:16px;
+  width:30px; height:30px; border-radius:50%;
+  border:1px solid var(--line-bright); background:var(--panel);
+  color:var(--muted); cursor:pointer; font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+}
+#modalClose:hover{ color:var(--text); border-color:var(--sky); }
+#modalTag{ font-family:var(--mono); font-size:11px; color:var(--modal-accent, var(--coral)); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; }
+#modalTitle{ font-size:19px; font-weight:700; margin:0 0 16px; padding-right:24px; }
+#modalBody p{ font-size:13.5px; color:var(--text); line-height:1.85; margin:0 0 12px; }
+#modalBody p:last-child{ margin-bottom:0; }
+#modalBody code{ font-family:var(--mono); font-size:0.9em; background:rgba(143,180,217,0.12); color:var(--sky); padding:1px 6px; border-radius:4px; }
+#modalBody .code-block{ margin:10px 0; }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="actlabel">PART 1 · 시작</div>
+<div id="actbar"><span></span><span></span><span></span></div>
+<div id="counter">01 / 10</div>
+
+<div id="deck"><div id="track">
+
+  <!-- ============================================================
+       ▶ 슬라이드 내용 편집 방법
+       - <section class="slide" data-act="1|2|3">...</section> 한 덩어리가 슬라이드 한 장.
+       - 텍스트는 태그 안 글자만 바꾸면 됩니다.
+
+       ▶ 클릭하면 열리는 상세 설명(모달) 추가/편집 방법
+       - 카드에 class="expandable" 을 추가하고,
+         data-title="모달 제목"  data-body="모달 안에 들어갈 설명(HTML 가능)"
+         두 속성을 넣으면 자동으로 클릭 시 팝업이 뜹니다.
+       - 예시:
+         <div class="bignum expandable" data-title="제목" data-body="&lt;p&gt;설명1&lt;/p&gt;&lt;p&gt;설명2&lt;/p&gt;">
+       - data-body 안에서 큰따옴표를 쓰면 안 되고, 줄바꿈은 &lt;p&gt;...&lt;/p&gt; 로 문단을 나누면 됩니다.
+       ============================================================ -->
+
+  <!-- PART 1 : 시작 -->
+  <section class="slide" data-act="1" id="s0"><div class="slide-inner">
+    <p class="kicker">Part 1 · 시작</p>
+    <h1 class="big">해양사업부 근무실적 현황<br><span>대시보드는 왜 필요했나</span></h1>
+    <p class="lede">매주 반복되는 근무실적 취합·보고 업무를 하나의 화면으로 옮긴 과정과, 앞으로의 활용 방향을 공유드립니다.</p>
+    <div class="filehint">HRBP · 해양사업부 근무실적 관리</div>
+    <div class="presenter">발표자 · 두목님</div>
+  </div></section>
+
+  <section class="slide" data-act="1"><div class="slide-inner">
+    <p class="kicker">Part 1 · 시작</p>
+    <h2 class="slide-title">기존 방식의 한계</h2>
+    <p class="hint"><span class="dot-ico"></span>카드를 클릭하면 자세한 설명이 열립니다</p>
+    <div class="cols">
+      <ul class="col-list">
+        <li class="expandable" data-title="수작업 취합" data-body="<p>주차마다 엑셀 원본을 열어 피벗과 필터를 새로 걸어야 했고, 사람이 직접 52시간 초과자를 골라내는 과정이 반복됐습니다.</p><p>동일한 작업을 매주 반복하면서 소요 시간뿐 아니라 수작업 과정에서의 실수 가능성도 함께 누적됐습니다.</p>">
+          <b>수작업 취합</b><p>주차마다 피벗·필터를 새로 걸어야 했습니다.</p></li>
+        <li class="expandable" data-title="공유의 어려움" data-body="<p>엑셀 파일을 그대로 넘기면 팀별로 보이지 않아도 될 다른 팀 데이터까지 함께 노출되는 문제가 있었습니다.</p><p>보는 사람에 따라 필요한 범위만 골라 공유하기가 어려웠습니다.</p>">
+          <b>공유의 어려움</b><p>필요한 범위만 골라 공유하기 어려웠습니다.</p></li>
+      </ul>
+      <ul class="col-list">
+        <li class="expandable" data-title="추이 파악의 한계" data-body="<p>한 주 스냅샷만으로는 특정 인원이 몇 주째 연속으로 52시간을 넘기고 있는지 즉시 알기 어려웠습니다.</p><p>위험 신호를 조기에 포착하려면 여러 주차를 한눈에 비교할 수 있는 화면이 필요했습니다.</p>">
+          <b>추이 파악의 한계</b><p>몇 주째 연속 초과인지 바로 보기 어려웠습니다.</p></li>
+        <li class="expandable" data-title="이번 작업의 목표" data-body="<p>엑셀 데이터를 붙여넣기만 하면, 위험군·추이·부서 비교가 자동으로 계산되는 화면을 만드는 것이 목표였습니다.</p><p>서버나 별도 프로그램 설치 없이, 파일 하나로 누구나 열어볼 수 있어야 한다는 조건도 함께 뒀습니다.</p>">
+          <b>목표</b><p>붙여넣기만 하면 자동 계산되는 화면.</p></li>
+      </ul>
+    </div>
+  </div></section>
+
+  <!-- PART 2 : 개발 과정 -->
+  <section class="slide" data-act="2"><div class="slide-inner">
+    <p class="kicker">Part 2 · 개발 과정</p>
+    <h2 class="slide-title">전체 구조는 4단계입니다</h2>
+    <p class="hint"><span class="dot-ico"></span>각 단계를 클릭하면 자세한 설명이 열립니다</p>
+    <div class="rail">
+      <div class="rail-step expandable" data-title="01 · 데이터" data-body="<p>388행 부근, 백틱 문자열 하나(EMBEDDED_SAMPLE_CSV)에 CSV 원문 약 1,300줄이 그대로 내장돼 있습니다.</p><p>CSV 불러오기 버튼을 누르면 UTF-8 / UTF-16 / EUC-KR 인코딩을 자동으로 판별해 실제 데이터로 교체합니다.</p><div class='code-block'><span class='c2'>const</span> EMBEDDED_SAMPLE_CSV = <span class='c1'>`No.,구분,년월,주차,...`</span>;</div>">
+        <b>01 데이터</b><span>CSV 내장 / 로딩</span></div>
+      <div class="rail-arrow">→</div>
+      <div class="rail-step expandable" data-title="02 · 필터·집계" data-body="<p>render() 함수 하나가 근태예외자·임원을 걸러내고, 사업장·부서 필터를 적용한 뒤 주차별로 데이터를 그룹핑합니다.</p><p>이렇게 정리된 배열을 이어서 8개 화면 함수에 그대로 넘겨줍니다.</p>">
+        <b>02 필터·집계</b><span>render()</span></div>
+      <div class="rail-arrow">→</div>
+      <div class="rail-step expandable" data-title="03 · 렌더 함수 8개" data-body="<p>KPI, 추이, 부서 순위, 시간대 분포, 요일별 편차, 주말 근무, 사업장 순위, 위험군 테이블 — 8개 함수가 각자 담당하는 화면을 다시 그립니다.</p><p>자세한 내용은 다음 슬라이드에서 하나씩 클릭해 확인할 수 있습니다.</p>">
+        <b>03 렌더 함수 8개</b><span>renderKpis 등</span></div>
+      <div class="rail-arrow">→</div>
+      <div class="rail-step expandable" data-title="04 · 화면 카드" data-body="<p>카드들은 자기만의 상태를 갖지 않습니다. 매번 innerHTML로 담당 영역을 통째로 다시 씁니다.</p><p>React 같은 프레임워크 없이, 순수 JS만으로 흉내 낸 단방향 리렌더링 구조입니다.</p>">
+        <b>04 화면 카드</b><span>DOM 갱신</span></div>
+    </div>
+    <p class="lede" style="margin-top:28px;">서버나 데이터베이스 없이, 브라우저에서 파일 하나를 여는 것만으로 전 과정이 동작하도록 설계했습니다.</p>
+  </div></section>
+
+  <section class="slide" data-act="2"><div class="slide-inner">
+    <p class="kicker">Part 2 · 개발 과정</p>
+    <h2 class="slide-title">01 — 데이터를 파일 안에 내장</h2>
+    <div class="cols">
+      <div class="code-block"><span class="c2">const</span> EMBEDDED_SAMPLE_CSV = <span class="c1">\`No.,구분,년월,주차,
+사번,이름,직급,사업장,부서명,
+월,화,수,목,금,토,일, ...\`</span>;</div>
+      <ul class="col-list">
+        <li><b>엑셀 → CSV 변환</b><p>전사명부·근무실적 원본(xlsx)을 정리해 CSV 텍스트로 바꾸고 파일 안에 그대로 붙여 넣었습니다.</p></li>
+        <li><b>즉시 표시</b><p>파일을 열면 서버 요청 없이 바로 데이터가 보이도록 했습니다.</p></li>
+        <li><b>자체 CSV 파서</b><p>외부 라이브러리 없이 따옴표·쉼표를 처리하는 파서를 직접 구현했습니다.</p></li>
+      </ul>
+    </div>
+  </div></section>
+
+  <section class="slide" data-act="2"><div class="slide-inner">
+    <p class="kicker">Part 2 · 개발 과정</p>
+    <h2 class="slide-title">02 — 필터링·집계 규칙 정의</h2>
+    <p class="hint"><span class="dot-ico"></span>카드를 클릭하면 자세한 설명이 열립니다</p>
+    <div class="bignum-grid">
+      <div class="bignum expandable" data-title="52시간 기준선" data-body="<p>주확정근무시간이 3,120분(52시간)을 넘으면 위험 대상으로 계산합니다.</p><p>원본 데이터가 분 단위로 저장돼 있어, 화면에 표시할 때는 60으로 나눠 시간 단위로 바꿉니다.</p>">
+        <div class="n">52h</div><div class="l">주확정근무시간 기준선 — 이 시간을 넘으면 위험군으로 계산합니다.</div></div>
+      <div class="bignum expandable" data-title="연속 2주 이상" data-body="<p>최신 주차부터 거꾸로 훑으면서 52시간 이상이 몇 주 연속으로 이어지는지(streak) 계산합니다.</p><p>2주 이상 끊기지 않고 이어질 때만 위험군 테이블에 노출되며, 연속 주차가 길수록 진한 강조색 태그가 붙습니다.</p>">
+        <div class="n">2주+</div><div class="l">연속 52시간 초과가 2주 이상 이어지면 위험군 테이블에 노출됩니다.</div></div>
+      <div class="bignum expandable" data-title="자동 제외 규칙" data-body="<p>구분이 '근태예외자'이거나 직급이 상무·전무·부사장·전문위원인 행은 모든 집계에서 자동 제외됩니다.</p><p>이 규칙은 render() 맨 앞에서 한 번에 걸러지기 때문에, 이후 8개 화면 어디에도 해당 인원이 노출되지 않습니다.</p>">
+        <div class="n">자동제외</div><div class="l">근태예외자, 상무 이상 임원은 모든 집계에서 자동으로 빠집니다.</div></div>
+    </div>
+  </div></section>
+
+  <section class="slide" data-act="2"><div class="slide-inner">
+    <p class="kicker">Part 2 · 개발 과정</p>
+    <h2 class="slide-title">03 — 8개 화면을 동시에 갱신</h2>
+    <p class="hint"><span class="dot-ico"></span>카드를 클릭하면 각 함수의 동작 방식을 볼 수 있습니다</p>
+    <div class="grid8">
+      <div class="cell expandable" data-title="renderKpis()" data-body="<p>상단 KPI 4카드(52시간 비율, 위험군, 평균, 주말 근무 인원)를 채웁니다.</p><p>전주 대비 %p 변화까지 함께 계산해 화살표와 색으로 증감을 표시합니다.</p>">
+        <div class="ft">KPI 4종</div><div class="fn">renderKpis()</div><div class="fd">52시간 비율, 위험군, 평균, 주말 근무</div></div>
+      <div class="cell expandable" data-title="renderTrend()" data-body="<p>최근 6주간 52시간 근무자 비율을 SVG 라인차트로 그립니다.</p><p>각 주차의 좌표를 직접 계산해 polyline으로 연결하는 방식이라 외부 차트 라이브러리가 필요 없습니다.</p>">
+        <div class="ft">6주 추이</div><div class="fn">renderTrend()</div><div class="fd">SVG 라인차트</div></div>
+      <div class="cell expandable" data-title="renderDeptRanking()" data-body="<p>부서 필터가 없을 때는 전 부서 순위를, 특정 부서를 선택하면 '그 부서 vs 사업부 전체' 2개 막대만 보여주는 분기 로직이 있습니다.</p><p>52시간 지점에는 점선 기준선이 표시됩니다.</p>">
+        <div class="ft">부서 순위</div><div class="fn">renderDeptRanking()</div><div class="fd">전체 순위 / 부서 비교</div></div>
+      <div class="cell expandable" data-title="renderBuckets()" data-body="<p>근무시간을 구간(bucket)으로 나눠 SVG 파이차트 각도를 계산합니다.</p><p>파이 조각에 마우스를 올리면 해당 구간에 속한 인원 명단이 툴팁으로 뜹니다.</p>">
+        <div class="ft">시간대 분포</div><div class="fn">renderBuckets()</div><div class="fd">SVG 파이차트</div></div>
+      <div class="cell expandable" data-title="renderWeekday()" data-body="<p>평일 평균과 요일별 평균의 차이를 위·아래로 뻗는 막대(diverge bar)로 표현합니다.</p><p>편차가 가장 큰 요일에만 강조색을 사용해 시선을 집중시킵니다.</p>">
+        <div class="ft">요일별 편차</div><div class="fn">renderWeekday()</div><div class="fd">평일 평균 대비 편차</div></div>
+      <div class="cell expandable" data-title="renderWeekend()" data-body="<p>토요일·일요일 각각 근무 기록이 0보다 큰 인원만 걸러 인원 수와 평균 시간을 계산합니다.</p>">
+        <div class="ft">주말 근무</div><div class="fn">renderWeekend()</div><div class="fd">토·일 근무자·평균시간</div></div>
+      <div class="cell expandable" data-title="renderSiteRanking()" data-body="<p>renderDeptRanking과 같은 패턴입니다. 사업장 필터 유무에 따라 2-bar 비교 또는 전체 순위로 갈립니다.</p>">
+        <div class="ft">사업장 순위</div><div class="fn">renderSiteRanking()</div><div class="fd">사업장별 비교</div></div>
+      <div class="cell expandable" data-title="renderRiskTable()" data-body="<p>주차를 최신순으로 뒤집어 훑으며 52시간 이상이 끊기지 않고 몇 주 이어지는지 계산합니다.</p><p>연속 주차 수 기준 내림차순으로 정렬해 표로 보여줍니다.</p>">
+        <div class="ft">위험군 테이블</div><div class="fn">renderRiskTable()</div><div class="fd">연속 초과 주차 계산</div></div>
+    </div>
+  </div></section>
+
+  <section class="slide" data-act="2"><div class="slide-inner">
+    <p class="kicker">Part 2 · 개발 과정</p>
+    <h2 class="slide-title">보는 사람에 맞춘 커스터마이즈</h2>
+    <p class="lede" style="margin-bottom:24px;">색상 테마 4종(navy·teal·violet·warm)과 커스텀 HEX 색상, 팀별 데이터만 골라 내보내는 기능까지 반영했습니다.</p>
+    <div class="code-block">root.setProperty(<span class="c1">'--coral'</span>, pickedColor);
+<span class="c3">// 색상 변경 후 곧바로 재계산</span>
+render();</div>
+  </div></section>
+
+  <!-- PART 3 : 추후 활용 방안 -->
+  <section class="slide" data-act="3"><div class="slide-inner">
+    <p class="kicker">Part 3 · 추후 활용 방안</p>
+    <h2 class="slide-title">앞으로의 활용 계획</h2>
+    <p class="hint"><span class="dot-ico"></span>각 항목을 클릭하면 자세한 설명이 열립니다</p>
+    <div class="timeline">
+      <div class="tl-item expandable" data-title="단기 · 팀별 배포 정례화" data-body="<p>매주 데이터 갱신 후 '완성 파일로 저장' 기능으로 팀장 배포용 파일을 자동 생성합니다.</p><p>선택한 필터 기준으로만 데이터를 담아 내보내는 exportTeamHTML()을 활용하면, 팀별로 필요한 범위만 골라 배포할 수 있습니다.</p>">
+        <div class="when">단기</div><div class="what"><b>팀별 배포 정례화</b><p>매주 데이터 갱신 후 팀장 배포용 파일을 자동 생성합니다.</p></div></div>
+      <div class="tl-item expandable" data-title="중기 · 인사 변동 추적 연동" data-body="<p>휴직·복직·퇴직 등 인사 변동 기준일 조회 기능과 결합해, 근무실적 변화의 배경을 함께 설명할 수 있도록 확장합니다.</p><p>예를 들어 특정 부서의 평균 근무시간이 급증했을 때, 동시에 발생한 인력 결원 여부를 같은 화면에서 확인할 수 있게 됩니다.</p>">
+        <div class="when">중기</div><div class="what"><b>인사 변동 추적 연동</b><p>휴직·복직·퇴직 데이터와 결합해 원인까지 함께 설명합니다.</p></div></div>
+      <div class="tl-item expandable" data-title="장기 · 이직 위험 신호 결합" data-body="<p>승진 대기 기간, 평가 이력, 보상 포지셔닝 등 고신호 변수를 함께 보여줘 근무실적을 조기경보 지표로 발전시킵니다.</p><p>근무시간 데이터만으로는 보이지 않던 이직 위험 신호를, 다른 인사 데이터와 겹쳐 보면서 조기에 포착하는 것이 목표입니다.</p>">
+        <div class="when">장기</div><div class="what"><b>이직 위험 신호 결합</b><p>고신호 변수를 함께 보여줘 조기경보 지표로 발전시킵니다.</p></div></div>
+    </div>
+  </div></section>
+
+  <section class="slide" data-act="3"><div class="slide-inner">
+    <p class="kicker">Part 3 · 추후 활용 방안</p>
+    <h2 class="slide-title">한 줄 요약</h2>
+    <p class="lede" style="max-width:760px; font-size:15px;">단일 HTML 파일 안에 <b style="color:var(--text)">데이터</b> · <b style="color:var(--text)">계산 로직</b> · <b style="color:var(--text)">화면</b>이 모두 들어있어, 서버 없이도 매주 갱신·배포가 가능한 구조입니다.</p>
+    <div class="summary-grid">
+      <div><b>운영 부담 최소화</b>엑셀 파일 하나만 새로 붙여 넣으면 전체 화면이 재계산됩니다.</div>
+      <div><b>보안 · 배포 편의</b>팀별 필터 결과만 골라 별도 파일로 내보낼 수 있습니다.</div>
+      <div><b>확장 가능성</b>동일 구조에 인사 데이터를 추가로 결합할 수 있습니다.</div>
+    </div>
+  </div></section>
+
+</div></div>
+
+<div id="navbar">
+  <button class="nav-btn" id="prevBtn" aria-label="이전">‹</button>
+  <div id="dots"></div>
+  <button class="nav-btn" id="nextBtn" aria-label="다음">›</button>
+</div>
+
+<!-- 상세 설명 모달 -->
+<div id="modalOverlay">
+  <div id="modalBox">
+    <button id="modalClose" aria-label="닫기">✕</button>
+    <div id="modalTag">자세히 보기</div>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   아래 코드는 건드리지 않아도 됩니다.
+   (슬라이드 넘기기 / 진행바 / 파트 라벨 / 모달 팝업 로직)
+   ============================================================ */
+const ACT_NAMES = { '1':'시작', '2':'개발 과정', '3':'추후 활용 방안' };
+const ACT_VARS  = { '1':'--act1', '2':'--act2', '3':'--act3' };
+
+const track = document.getElementById('track');
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+let idx = 0;
+
+const dotsEl = document.getElementById('dots');
+slides.forEach((_,i)=>{
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0 ? ' active':'');
+  d.addEventListener('click', ()=> goTo(i));
+  dotsEl.appendChild(d);
+});
+const dots = dotsEl.querySelectorAll('.dot');
+const counter = document.getElementById('counter');
+const progress = document.getElementById('progress');
+const actlabel = document.getElementById('actlabel');
+const actbarSpans = document.querySelectorAll('#actbar span');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const root = document.documentElement;
+
+function pad(n){ return String(n+1).padStart(2,'0'); }
+
+function render(){
+  track.style.transform = `translateX(-${idx*100}vw)`;
+  dots.forEach((d,i)=> d.classList.toggle('active', i===idx));
+  counter.textContent = `${pad(idx)} / ${pad(total-1)}`;
+  progress.style.width = `${((idx+1)/total)*100}%`;
+  prevBtn.disabled = idx===0;
+  nextBtn.disabled = idx===total-1;
+
+  const act = slides[idx].dataset.act || '1';
+  const color = getComputedStyle(root).getPropertyValue(ACT_VARS[act]).trim();
+  actlabel.textContent = `PART ${act} · ${ACT_NAMES[act]}`;
+  actlabel.style.color = color;
+  progress.style.background = color;
+  actbarSpans.forEach((s,i)=> s.style.background = (String(i+1)===act) ? color : 'var(--line)');
+  slides[idx].style.setProperty('--kicker-color', color);
+}
+function goTo(i){
+  idx = Math.max(0, Math.min(total-1, i));
+  render();
+  closeModal();
+}
+prevBtn.addEventListener('click', ()=> goTo(idx-1));
+nextBtn.addEventListener('click', ()=> goTo(idx+1));
+
+document.addEventListener('keydown', (e)=>{
+  if(modalOverlay.classList.contains('open')){
+    if(e.key==='Escape') closeModal();
+    return;
+  }
+  if(e.key==='ArrowRight' || e.key===' ') { goTo(idx+1); e.preventDefault(); }
+  else if(e.key==='ArrowLeft'){ goTo(idx-1); e.preventDefault(); }
+  else if(e.key==='Home'){ goTo(0); }
+  else if(e.key==='End'){ goTo(total-1); }
+});
+
+let touchX = null;
+document.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+document.addEventListener('touchend', e => {
+  if(touchX===null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(Math.abs(dx) > 60){ dx < 0 ? goTo(idx+1) : goTo(idx-1); }
+  touchX = null;
+});
+let wheelLock = false;
+document.addEventListener('wheel', e => {
+  if(Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
+  if(wheelLock) return;
+  if(Math.abs(e.deltaX) > 30){
+    wheelLock = true;
+    e.deltaX > 0 ? goTo(idx+1) : goTo(idx-1);
+    setTimeout(()=> wheelLock=false, 500);
+  }
+}, {passive:true});
+
+/* ---------- 모달 ---------- */
+const modalOverlay = document.getElementById('modalOverlay');
+const modalBox = document.getElementById('modalBox');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+const modalClose = document.getElementById('modalClose');
+
+function openModal(el){
+  const act = el.closest('.slide')?.dataset.act || '1';
+  const color = getComputedStyle(root).getPropertyValue(ACT_VARS[act]).trim();
+  modalBox.style.setProperty('--modal-accent', color);
+  modalTitle.textContent = el.dataset.title || '';
+  modalBody.innerHTML = el.dataset.body || '';
+  modalOverlay.classList.add('open');
+}
+function closeModal(){ modalOverlay.classList.remove('open'); }
+
+document.querySelectorAll('.expandable').forEach(el=>{
+  el.addEventListener('click', ()=> openModal(el));
+});
+modalClose.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e)=>{ if(e.target===modalOverlay) closeModal(); });
+
+render();
+</script>
+</body>
+</html>
