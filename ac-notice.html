@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>서울2사업장 에어컨 이용 안내</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EDF3F2;
+    --card: #FFFFFF;
+    --ink: #14262B;
+    --muted: #5B6E6C;
+    --cool: #2E7D9E;
+    --cool-pale: #E4F0F4;
+    --warm: #F0924A;
+    --warm-pale: #FDECDD;
+    --line: #DCE6E4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    font-family:'Pretendard Variable','Pretendard',-apple-system,sans-serif;
+    color:var(--ink);
+  }
+  .num{font-family:'Space Grotesk','Pretendard Variable',sans-serif;}
+
+  .card{
+    width:100%;
+    max-width:640px;
+    background:var(--card);
+    border-radius:28px;
+    overflow:hidden;
+    box-shadow:0 30px 60px -20px rgba(20,38,43,0.18);
+    border:1px solid var(--line);
+  }
+
+  .head{
+    padding:36px 44px 0 44px;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    color:var(--cool);
+    background:var(--cool-pale);
+    padding:7px 14px;
+    border-radius:100px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:6px;height:6px;border-radius:50%;
+    background:var(--cool);
+    display:inline-block;
+  }
+  h1{
+    margin-top:20px;
+    font-size:30px;
+    line-height:1.35;
+    font-weight:800;
+    letter-spacing:-0.01em;
+  }
+  h1 span{color:var(--cool);}
+  .sub{
+    margin-top:10px;
+    font-size:15px;
+    color:var(--muted);
+    line-height:1.6;
+    font-weight:500;
+  }
+
+  /* signature: hourly cycle dial */
+  .dial-wrap{
+    margin:30px 44px 8px 44px;
+    background:linear-gradient(180deg,#F7FBFA 0%, #EFF6F4 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:26px 20px 22px 20px;
+    display:flex;
+    align-items:center;
+    gap:26px;
+  }
+  .dial{
+    position:relative;
+    width:118px;
+    height:118px;
+    flex:none;
+  }
+  .dial svg{width:100%;height:100%;}
+  .dial-center{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+  .dial-center .t{
+    font-size:19px;
+    font-weight:700;
+  }
+  .dial-center .l{
+    font-size:10.5px;
+    color:var(--muted);
+    font-weight:600;
+    margin-top:1px;
+  }
+  .tick{
+    transform-origin:59px 59px;
+  }
+
+  .dial-copy{flex:1;}
+  .dial-copy .row{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    padding:7px 0;
+  }
+  .dial-copy .row + .row{
+    border-top:1px dashed var(--line);
+  }
+  .dial-copy .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--cool);
+    flex:none;
+  }
+  .dial-copy .k{
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .dial-copy .v{
+    font-size:13px;
+    color:var(--muted);
+    font-weight:500;
+  }
+
+  .badge{
+    margin:22px 44px 0 44px;
+    background:var(--warm-pale);
+    border:1px solid #F6D9BC;
+    border-radius:16px;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .badge .icon{
+    flex:none;
+    width:38px;height:38px;
+    border-radius:50%;
+    background:var(--warm);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .badge .icon svg{width:19px;height:19px;}
+  .badge .txt .t1{
+    font-size:15px;
+    font-weight:800;
+    color:#9C4A12;
+  }
+  .badge .txt .t2{
+    margin-top:2px;
+    font-size:12.5px;
+    color:#8A5A32;
+    font-weight:500;
+  }
+
+  .foot{
+    margin-top:26px;
+    padding:16px 44px 30px 44px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-top:1px solid var(--line);
+  }
+  .foot .org{
+    font-size:12px;
+    font-weight:700;
+    color:var(--muted);
+    letter-spacing:0.02em;
+  }
+  .foot .org b{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="head">
+    <span class="eyebrow">서울2사업장 시설 안내</span>
+    <h1>에어컨이 <span>매시 정각</span>마다<br>잠깐씩 꺼집니다</h1>
+    <p class="sub">20시 이후 자동 절전 기능이 작동합니다. 전원을 다시 켜주시면 정상적으로 이용하실 수 있습니다.</p>
+  </div>
+
+  <div class="dial-wrap">
+    <div class="dial">
+      <svg viewBox="0 0 118 118">
+        <circle cx="59" cy="59" r="52" fill="none" stroke="#DCE6E4" stroke-width="2"/>
+        <circle cx="59" cy="59" r="52" fill="none" stroke="#2E7D9E" stroke-width="2"
+                stroke-dasharray="8 6" stroke-linecap="round"/>
+        <g>
+          <circle class="tick" cx="59" cy="15" r="3.4" fill="#2E7D9E" transform="rotate(0)"/>
+          <circle class="tick" cx="59" cy="15" r="3.4" fill="#2E7D9E" transform="rotate(60)"/>
+          <circle class="tick" cx="59" cy="15" r="3.4" fill="#2E7D9E" transform="rotate(120)"/>
+          <circle class="tick" cx="59" cy="15" r="3.4" fill="#F0924A" transform="rotate(180)"/>
+          <circle class="tick" cx="59" cy="15" r="3.4" fill="#2E7D9E" transform="rotate(240)"/>
+          <circle class="tick" cx="59" cy="15" r="3.4" fill="#2E7D9E" transform="rotate(300)"/>
+        </g>
+        <line x1="59" y1="59" x2="59" y2="26" stroke="#14262B" stroke-width="2.4" stroke-linecap="round"/>
+        <line x1="59" y1="59" x2="80" y2="59" stroke="#14262B" stroke-width="2.4" stroke-linecap="round" opacity="0.55"/>
+        <circle cx="59" cy="59" r="4" fill="#14262B"/>
+      </svg>
+      <div class="dial-center" style="opacity:0"></div>
+    </div>
+    <div class="dial-copy">
+      <div class="row"><span class="dot"></span><span class="k">20:00 ~</span><span class="v">자동 절전 시작</span></div>
+      <div class="row"><span class="dot" style="background:#F0924A"></span><span class="k num">1시간</span><span class="v">마다 자동 OFF</span></div>
+      <div class="row"><span class="dot"></span><span class="k">전원 재입력</span><span class="v">시 즉시 정상 작동</span></div>
+    </div>
+  </div>
+
+  <div class="badge">
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+    <div class="txt">
+      <div class="t1">고장이 아니니 걱정하지 않으셔도 됩니다</div>
+      <div class="t2">에어컨이 꺼지면 전원 버튼을 다시 눌러 재가동해 주세요.</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="org"><b>한화시스템</b> 해양사업부 · 서울2사업장</span>
+    <span class="org">HR지원팀</span>
+  </div>
+</div>
+
+</body>
+</html>
